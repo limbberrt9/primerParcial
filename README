@@ -1,10 +1,7 @@
-Nota es una aplicación de notas simple pero poderosa que te permite capturar,
+crear un sistema de notas simple pero poderosa que te permite capturar,
 organizar y gestionar tus notas de manera eficiente.
 Con sus funciones básicas de CRUD
-(Crear, Leer, Actualizar y Eliminar), puedes mantener tus pensamientos, 
-ideas y tareas en orden y a tu alcance.
+(Crear, Leer, Actualizar y Eliminar) ademas de otras funciones.
 
 Objetivos específicos:
-
-Facilitar la creación de nuevas notas con campos esenciales como título, descripcion, fecha y autor.
-Permitir la búsqueda de notas por título, contenido y fecha.
+Optimizar la gestión de información y colaboración entre empleados para impulsar la productividad y el logro de objetivos empresariales

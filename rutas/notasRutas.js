@@ -1,6 +1,11 @@
+
+//RUTAS notasRutas.js
 const express = require('express');
 const rutas = express.Router();
 const notasModel = require('../models/Notas');
+const NotasModel = require('../models/Notas');
+const categoriasModel = require('../models/Categorias');
+const CategoriaModel = require('../models/Categorias');
 
 //END POINT TRAER TODO
 rutas.get('/traerNotas', async (req, res) => {
@@ -19,7 +24,8 @@ rutas.post('/crear', async (req, res) => {
         titulo: req.body.titulo,
         autor: req.body.autor,
         descripcion: req.body.descripcion,
-        fecha:req.body.fecha
+        fecha:req.body.fecha, 
+        categorias: req.body.categorias
     })
     try {
         const nuevaNotas = await notas.save();
@@ -88,7 +94,7 @@ rutas.get('/notasPorPalabraClave/:palabra', async (req, res) => {
     }
 });
 
-//END BUSCAR POR 3 CAMPOS 
+//END BUSCAR POR  CAMPOS 
 rutas.get('/buscarNotas', async (req, res) => {
     try {
         const { titulo, descripcion, autor } = req.query;
@@ -163,6 +169,64 @@ rutas.get('/notasOrdenadasDesc', async (req, res) => {
         res.status(500).json({ mensaje: error.message });
     }
 });
+
+
+//REPORTES 1
+rutas.get('/notasPorUsuario/:usuarioId', async (peticion, respuesta) =>{
+    const {categoriasId} = peticion.params;
+    console.log(categoriasId);
+    try{
+        const categorias = await categoriasModel.findById(categoriasId);
+        if (!categorias)
+            return respuesta.status(404).json({mensaje: 'categoria no encontrado'});
+        const categoria = await categoriasModel.find({ categoria: categoriasId}).populate('categoria');
+        respuesta.json(categoria);
+
+    } catch(error){
+        respuesta.status(500).json({ mensaje :  error.message})
+    }
+})  
+
+
+
+
+/***********MUESTRA TODAS LAS NOTAS DE UNA CATEGORIA ************** */
+rutas.get('/notasPorCategoria/:idCategoria', async (req, res) => {
+    try {
+        const idCategoria = req.params.idCategoria;
+
+        // Encuentra la categoría específica por su ID
+        const categoria = await CategoriaModel.findById(idCategoria);
+        if (!categoria) {
+            return res.status(404).json({ mensaje: 'Categoría no encontrada' });
+        }
+
+        // Obtén todas las notas asociadas con la categoría encontrada
+        const notas = await NotasModel.find({ categorias: categoria._id });
+
+        // Estructura la respuesta con los campos adicionales de la categoría
+        const notasConCategoria = notas.map(nota => ({
+            idNota: nota._id,
+            Titulo: nota.titulo,
+            Descripcion: nota.descripcion,
+            fechaCreacion: nota.fechaCreacion,
+            fechaModificacion: nota.fechaModificacion,
+            idUsuario: nota.idUsuario,
+            categoria: {
+                idCategoria: categoria._id,
+                nombreCategorias: categoria.nombreCategorias,
+                estado: categoria.estado,
+                descripcion: categoria.descripcion
+            }
+        }));
+
+        res.json(notasConCategoria);
+    } catch (error) {
+        res.status(500).json({ mensaje: error.message });
+    }
+});
+
+
 
 //exportar rutas 
 module.exports = rutas;
